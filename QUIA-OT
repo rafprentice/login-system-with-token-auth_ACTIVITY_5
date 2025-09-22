@@ -1,0 +1,188 @@
+using System;
+
+namespace SecuredLoginSystem
+{
+    class Program
+    {
+        // Simple list of users (username, password)
+        static string[,] users = new string[,]
+        {
+            { "admin", "admin123" },
+            { "user", "user123" }
+        };
+
+        // Stores token after successful login
+        static string token = "";
+
+        static void Main(string[] args)
+        {
+            int choice;
+
+            while (true) // loop until user exits
+            {
+                Console.WriteLine("\n=== MAIN MENU ===");
+                Console.WriteLine("1. Login");
+                Console.WriteLine("2. Global Check (String Activities)");
+                Console.WriteLine("3. Authorization Check");
+                Console.WriteLine("4. Logout");
+                Console.Write("Enter your choice: ");
+
+                // Validate input
+                if (!int.TryParse(Console.ReadLine(), out choice))
+                {
+                    Console.WriteLine("Please enter a valid number!");
+                    continue;
+                }
+
+                // Menu options
+                if (choice == 1)
+                {
+                    Login();
+                }
+                else if (choice == 2)
+                {
+                    GlobalCheck();
+                }
+                else if (choice == 3)
+                {
+                    AuthorizationCheck();
+                }
+                else if (choice == 4)
+                {
+                    Logout();
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice. Try again.");
+                }
+            }
+        }
+
+        // Login function
+        static void Login()
+        {
+            int attempts = 0;
+            bool loggedIn = false;
+
+            while (attempts < 3 && !loggedIn)
+            {
+                Console.Write("\nEnter Username: ");
+                string username = Console.ReadLine();
+
+                Console.Write("Enter Password: ");
+                string password = Console.ReadLine();
+
+                // Check username & password
+                for (int i = 0; i < users.GetLength(0); i++)
+                {
+                    if (users[i, 0] == username && users[i, 1] == password)
+                    {
+                        Console.WriteLine("Login Successful!");
+                        token = GenerateToken(username, password);
+                        Console.WriteLine("Generated Token: " + token);
+                        loggedIn = true;
+                        break;
+                    }
+                }
+
+                if (!loggedIn)
+                {
+                    attempts++;
+                    Console.WriteLine("Invalid credentials. Attempts left: " + (3 - attempts));
+                }
+            }
+
+            if (!loggedIn)
+            {
+                Console.WriteLine("Too many failed attempts. Exiting...");
+                Environment.Exit(0);
+            }
+        }
+
+        // String exercises
+        static void GlobalCheck()
+        {
+            int option;
+
+            while (true)
+            {
+                Console.WriteLine("\n=== GLOBAL CHECK ===");
+                Console.WriteLine("1. Reverse a sentence");
+                Console.WriteLine("2. Search a word in a paragraph");
+                Console.WriteLine("3. Go back");
+                Console.Write("Enter your choice: ");
+
+                if (!int.TryParse(Console.ReadLine(), out option))
+                {
+                    Console.WriteLine("Please enter a valid number!");
+                    continue;
+                }
+
+                if (option == 1)
+                {
+                    Console.Write("Enter a sentence: ");
+                    string sentence = Console.ReadLine();
+                    string[] words = sentence.Split(' ');
+                    Array.Reverse(words);
+                    Console.WriteLine("Reversed sentence: " + string.Join(" ", words));
+                }
+                else if (option == 2)
+                {
+                    string paragraph = "Learning C# is fun and powerful for beginners.";
+                    Console.WriteLine("\nParagraph: " + paragraph);
+                    Console.Write("Enter a word to search: ");
+                    string searchWord = Console.ReadLine();
+
+                    if (paragraph.ToLower().Contains(searchWord.ToLower()))
+                        Console.WriteLine("Word found!");
+                    else
+                        Console.WriteLine("Word not found!");
+                }
+                else if (option == 3)
+                {
+                    Console.WriteLine("Returning to main menu...");
+                    return; // exit to main menu
+                }
+                else
+                {
+                    Console.WriteLine("Invalid option. Try again.");
+                }
+            }
+        }
+
+        // Check if user is authorized
+        static void AuthorizationCheck()
+        {
+            if (!string.IsNullOrEmpty(token))
+            {
+                Console.WriteLine("You are authorized!");
+            }
+            else
+            {
+                Console.WriteLine("Unauthorized. Please log in first.");
+            }
+        }
+
+        // Logout user
+        static void Logout()
+        {
+            token = "";
+            Console.WriteLine("You have been logged out.");
+        }
+
+        // Generate token (simple version)
+        static string GenerateToken(string username, string password)
+        {
+            string reversed = ReverseString(password);
+            return reversed + "_" + username;
+        }
+
+        // Helper: reverse any string
+        static string ReverseString(string str)
+        {
+            char[] arr = str.ToCharArray();
+            Array.Reverse(arr);
+            return new string(arr);
+        }
+    }
+}
